@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key used for JWT token generation and validation",
+      "sourceType": "com.taskmanagement.security.JwtUtils"
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.Integer",
+      "description": "JWT token expiration time in milliseconds",
+      "sourceType": "com.taskmanagement.security.JwtUtils"
+    }
+  ]
+}
