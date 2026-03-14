@@ -1,6 +1,5 @@
--- =====================================================
+
 -- Mini Task Management System - Complete MySQL Schema
--- =====================================================
 
 -- Create Database
 DROP DATABASE IF EXISTS task_management_db;
@@ -10,9 +9,6 @@ COLLATE utf8mb4_unicode_ci;
 
 USE task_management_db;
 
--- =====================================================
--- Table: users
--- =====================================================
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -30,9 +26,8 @@ CREATE TABLE users (
     INDEX idx_users_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================
 -- Table: tasks
--- =====================================================
+
 CREATE TABLE tasks (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(200) NOT NULL,
@@ -54,23 +49,17 @@ CREATE TABLE tasks (
     INDEX idx_tasks_due_date (due_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================
--- Insert Default Admin User
--- =====================================================
--- Default password: Admin@123 (BCrypt hash)
+
 INSERT INTO users (username, email, password_hash, full_name, role) VALUES
 ('admin', 'admin@taskmanagement.com', '$2a$10$rJk0CQnXmQYqQYqQYqQYqO', 'System Administrator', 'ADMIN');
 
--- =====================================================
--- Insert Sample Users
--- =====================================================
+
 INSERT INTO users (username, email, password_hash, full_name, role) VALUES
 ('john.doe', 'john@example.com', '$2a$10$rJk0CQnXmQYqQYqQYqQYqO', 'John Doe', 'USER'),
 ('jane.smith', 'jane@example.com', '$2a$10$rJk0CQnXmQYqQYqQYqQYqO', 'Jane Smith', 'USER');
 
--- =====================================================
 -- Insert Sample Tasks
--- =====================================================
+
 INSERT INTO tasks (title, description, status, priority, due_date, user_id) VALUES
 -- Admin's tasks
 ('Setup Project Infrastructure', 'Initialize Spring Boot and Next.js projects', 'DONE', 'HIGH', DATE_ADD(CURDATE(), INTERVAL -5 DAY), 1),
@@ -85,9 +74,7 @@ INSERT INTO tasks (title, description, status, priority, due_date, user_id) VALU
 ('Design UI Components', 'Create reusable React components', 'DONE', 'HIGH', DATE_ADD(CURDATE(), INTERVAL -3 DAY), 3),
 ('Add Filtering', 'Implement task filtering by status and priority', 'IN_PROGRESS', 'MEDIUM', DATE_ADD(CURDATE(), INTERVAL 4 DAY), 3);
 
--- =====================================================
--- Verification Queries
--- =====================================================
+
 SELECT 'Database created successfully!' AS 'Status';
 SELECT CONCAT('Total Users: ', COUNT(*)) AS 'Summary' FROM users;
 SELECT CONCAT('Total Tasks: ', COUNT(*)) AS 'Summary' FROM tasks;

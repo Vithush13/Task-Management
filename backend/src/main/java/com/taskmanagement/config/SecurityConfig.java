@@ -2,7 +2,6 @@ package com.taskmanagement.config;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,17 +29,19 @@ import com.taskmanagement.security.JwtAuthenticationFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
     
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
-    
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // Constructor injection instead of field injection
+    public SecurityConfig(
+            UserDetailsService userDetailsService,
+            JwtAuthenticationEntryPoint unauthorizedHandler,
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,9 +50,9 @@ public class SecurityConfig {
     
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        // In Spring Security 7.x, DaoAuthenticationProvider requires UserDetailsService in constructor
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
+        // Use the passwordEncoder() method directly - don't autowire it
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
     

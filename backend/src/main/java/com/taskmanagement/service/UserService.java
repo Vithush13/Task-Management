@@ -1,13 +1,14 @@
 package com.taskmanagement.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.taskmanagement.dto.RegisterRequest;
 import com.taskmanagement.entity.Role;
 import com.taskmanagement.entity.User;
 import com.taskmanagement.exception.BadRequestException;
 import com.taskmanagement.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {

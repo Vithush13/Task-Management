@@ -1,18 +1,28 @@
 package com.taskmanagement.controller;
 
-import com.taskmanagement.dto.*;
-import com.taskmanagement.entity.User;
-import com.taskmanagement.security.JwtUtils;
-import com.taskmanagement.security.UserDetailsImpl;
-import com.taskmanagement.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.taskmanagement.dto.ApiResponse;
+import com.taskmanagement.dto.AuthResponse;
+import com.taskmanagement.dto.LoginRequest;
+import com.taskmanagement.dto.RegisterRequest;
+import com.taskmanagement.dto.UserDTO;
+import com.taskmanagement.entity.User;
+import com.taskmanagement.security.JwtUtils;
+import com.taskmanagement.security.UserDetailsImpl;
+import com.taskmanagement.service.UserService;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -28,10 +38,32 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        // Check if passwords match
+        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(ApiResponse.error("Passwords do not match"));
+        }
+        
+        User user = userService.registerUser(registerRequest);
+        
+        UserDTO userDTO = new UserDTO(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getFullName(),
+            user.getRole().name()
+        );
+        
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully", userDTO));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -41,13 +73,5 @@ public class AuthController {
 
         return ResponseEntity.ok(new AuthResponse(jwt, userDetails.getId(), 
                 userDetails.getUsername(), userDetails.getEmail(), role));
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        User user = userService.registerUser(registerRequest);
-        
-        return ResponseEntity.ok(ApiResponse.success("User registered successfully", 
-                new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getFullName(), user.getRole().name())));
     }
 }
